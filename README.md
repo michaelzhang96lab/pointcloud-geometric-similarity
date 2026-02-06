@@ -22,7 +22,7 @@ The primary application is **surface texture comparison** in precision manufactu
 
 ## Background and Motivation
 
-This programme is a replacement and upgrade of a critical component in the data fusion pipeline proposed in my PhD thesis (*Applications of Data Fusion in Optical Coordinate Metrology*, University of Nottingham, 2024).
+This programme is a replacement and upgrade of a critical component in the data fusion pipeline proposed in my PhD thesis (*A data fusion pipeline for registering point clouds with novel characteristics: enabling the computer to recognise a pattern without training dataset*, University of Nottingham, 2024).
 
 ### The Original Approach
 
@@ -139,7 +139,7 @@ pip install -r requirements.txt
 ### Generate Synthetic Test Data
 
 ```python
-from src.surface_pointcloud_generator import generate_test_set
+from surface_pointcloud_generator import generate_test_set
 
 # Creates three point clouds:
 # - Cloud A: High density, Texture 1
@@ -151,7 +151,7 @@ cloud_a, cloud_b, cloud_c = generate_test_set()
 ### Compare Point Clouds
 
 ```python
-from src.geometric_similarity import compare_point_clouds, print_comparison_summary
+from geometric_similarity import compare_point_clouds, print_comparison_summary
 
 # Load your point clouds (Nx3 numpy arrays)
 # points1, points2 = ...
@@ -169,7 +169,7 @@ print_comparison_summary(results, "A", "B")
 ### Run Full Test Suite
 
 ```bash
-python src/geometric_similarity.py
+python geometric_similarity.py
 ```
 
 This will:
@@ -186,23 +186,29 @@ pointcloud-geometric-similarity/
 ├── README.md
 ├── requirements.txt
 ├── .gitignore
+├── LICENSE
 │
-├── src/
-│   ├── surface_pointcloud_generator.py   # Synthetic surface generation
-│   ├── geometric_similarity.py           # Core comparison algorithms
-│   ├── visualize_surfaces.py             # Point cloud visualisation
-│   └── visualize_similarity.py           # Results visualisation
+├── surface_pointcloud_generator.py    # Synthetic surface generation
+├── geometric_similarity.py            # Core comparison algorithms
+├── visualize_surfaces.py              # Point cloud visualisation
+├── visualize_similarity.py            # Results visualisation
 │
-├── data/
-│   └── synthetic_surfaces/
-│       ├── cloud_A_high_density_texture1.ply
-│       ├── cloud_B_low_density_texture1.ply
-│       └── cloud_C_low_density_texture2.ply
+├── data/                              # Generated point cloud data
+│   ├── cloud_A_high_density_texture1.ply
+│   ├── cloud_A_high_density_texture1.csv
+│   ├── cloud_B_low_density_texture1.ply
+│   ├── cloud_B_low_density_texture1.csv
+│   ├── cloud_C_low_density_texture2.ply
+│   └── cloud_C_low_density_texture2.csv
 │
-└── results/
+└── results/                           # Output figures
+    ├── visualization.png
+    ├── comparison.png
+    ├── curvature_distributions.png
     ├── curvature_comparison_overlay.png
+    ├── curvature_maps.png
     ├── similarity_summary.png
-    └── ...
+    └── results_table.png
 ```
 
 ---
@@ -221,8 +227,17 @@ where $\lambda$ is the correlation length controlling texture feature size. Gene
 
 1. **Normal estimation**: PCA on k-nearest neighbours (default k=30)
 2. **Local surface fitting**: Quadric fit $z = ax^2 + bxy + cy^2 + dx + ey + f$ in local tangent-plane coordinates
-3. **Principal curvatures**: Eigenvalues of the shape operator $\begin{pmatrix} 2a & b \\ b & 2c \end{pmatrix}$
+3. **Principal curvatures**: Eigenvalues of the shape operator
+<div align="center">
 
+$$
+\begin{pmatrix} 
+2a & b \\ 
+b & 2c 
+\end{pmatrix}
+$$
+
+</div>
 ### Why Curvature Works for Surface Textures
 
 A finer texture (smaller correlation length $\lambda$) has more frequent peaks and valleys, resulting in higher local curvatures and a wider curvature distribution. A coarser texture has gentler undulations and curvatures concentrated near zero. This difference is captured in the distribution shape, regardless of point cloud orientation or density.
